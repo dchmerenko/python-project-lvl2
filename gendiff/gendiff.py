@@ -10,7 +10,7 @@ INDENT = '  '
 ROW_TEMPLATE = '{0}: {1}'
 
 
-def generate_diff(file_path1, file_path2):
+def generate_diff(file_path1, file_path2):  # noqa: WPS210
     """Return file difference.
 
     Args:
