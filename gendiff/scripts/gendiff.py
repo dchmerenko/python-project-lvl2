@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """Difference Calculator main script."""
 
-import argparse
+import argparse, pprint
+
+from gendiff import generate_diff
 
 
 def main():
@@ -13,8 +15,18 @@ def main():
                         # choices=['plain', 'json'],
                         default='plain',
                         help='set format of output')
-    parser.parse_args()
+    args = parser.parse_args()
 
+    print('first file:', args.first_file)
+    print('second file:', args.second_file)
+    print('format:', args.format)
+
+    file_path1 = args.first_file
+    file_path2 = args.second_file
+    format_ = args.format
+
+    diff = generate_diff(file_path1, file_path2)
+    pprint.pprint(diff)
 
 
 if __name__ == '__main__':
