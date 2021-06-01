@@ -3,7 +3,7 @@
 
 import argparse
 
-from gendiff import generate_diff
+from gendiff.gendiff import generate_diff
 
 
 def main():
@@ -14,7 +14,6 @@ def main():
     parser.add_argument(
         '-f',
         '--format',
-        choices=['plain', 'json'],
         default='plain',
         help='set format of output',
     )
