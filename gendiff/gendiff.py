@@ -1,7 +1,8 @@
 """Generate_diff module."""
 
-import json
 from collections import namedtuple
+
+import yaml
 
 ADDED = '+'
 UNCHANGED = ' '
@@ -20,23 +21,24 @@ def generate_diff(file_path1, file_path2):
     Returns:
         multi-line string with differences
     """
+    # as json is a valid yaml format, no need to process json separately
     with open(file_path1) as f1:
-        json1 = json.load(f1)
+        data1 = yaml.safe_load(f1)
     with open(file_path2) as f2:
-        json2 = json.load(f2)
+        data2 = yaml.safe_load(f2)
 
-    json_diff = get_json_diff(json1, json2)
+    data_diff = get_data_diff(data1, data2)
 
-    return convert_diff_to_string(json_diff)
+    return convert_diff_to_string(data_diff)
 
 
-def get_json_diff(json1, json2):
+def get_data_diff(data1, data2):
     """
-    Return a json difference.
+    Return a data difference.
 
     Args:
-        json1: first json
-        json2: second json
+        data1: first data
+        data2: second data
 
     Returns:
         list of differences
@@ -45,21 +47,21 @@ def get_json_diff(json1, json2):
     # WPS110 Found wrong variable name: Item - Item it's a class name
     Item = namedtuple('Item', 'key, prefix, value')  # noqa: WPS110
 
-    added_keys = json2.keys() - json1.keys()
-    removed_keys = json1.keys() - json2.keys()
+    added_keys = data2.keys() - data1.keys()
+    removed_keys = data1.keys() - data2.keys()
 
-    for key in sorted(json1.keys() | json2.keys()):
+    for key in sorted(data1.keys() | data2.keys()):
         if key in removed_keys:
-            diff.append(Item(key, REMOVED, json1[key]))
+            diff.append(Item(key, REMOVED, data1[key]))
         elif key in added_keys:
-            diff.append(Item(key, ADDED, json2[key]))
+            diff.append(Item(key, ADDED, data2[key]))
         # if key is not in removed_keys and added_keys then key is unchanged
         # but value may be different
-        elif json1[key] == json2[key]:
-            diff.append(Item(key, UNCHANGED, json1[key]))
+        elif data1[key] == data2[key]:
+            diff.append(Item(key, UNCHANGED, data1[key]))
         else:
-            diff.append(Item(key, REMOVED, json1[key]))
-            diff.append(Item(key, ADDED, json2[key]))
+            diff.append(Item(key, REMOVED, data1[key]))
+            diff.append(Item(key, ADDED, data2[key]))
 
     return diff
 
