@@ -11,6 +11,7 @@ def gendiff_help_message():
 
 
 def test_scripts_gendiff_help_message(gendiff_help_message):
+    """Test script help screen message."""
     assert gendiff_help_message == subprocess.check_output(
         ["gendiff", "-h"],
         universal_newlines=True,
@@ -18,6 +19,7 @@ def test_scripts_gendiff_help_message(gendiff_help_message):
 
 
 def test_scripts_plain_json(plain_file_diff):
+    """Test script process plain json files differences."""
     assert plain_file_diff == subprocess.check_output(
         ["gendiff", "tests/fixtures/file1.json", "tests/fixtures/file2.json"],
         universal_newlines=True,

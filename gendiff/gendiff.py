@@ -44,24 +44,23 @@ def get_data_diff(data1, data2):
         list of differences
     """
     diff = []
-    # WPS110 Found wrong variable name: Item - Item it's a class name
-    Item = namedtuple('Item', 'key, prefix, value')  # noqa: WPS110
+    DiffItem = namedtuple('Item', 'key, prefix, value')
 
     added_keys = data2.keys() - data1.keys()
     removed_keys = data1.keys() - data2.keys()
 
     for key in sorted(data1.keys() | data2.keys()):
         if key in removed_keys:
-            diff.append(Item(key, REMOVED, data1[key]))
+            diff.append(DiffItem(key, REMOVED, data1[key]))
         elif key in added_keys:
-            diff.append(Item(key, ADDED, data2[key]))
+            diff.append(DiffItem(key, ADDED, data2[key]))
         # if key is not in removed_keys and added_keys then key is unchanged
         # but value may be different
         elif data1[key] == data2[key]:
-            diff.append(Item(key, UNCHANGED, data1[key]))
+            diff.append(DiffItem(key, UNCHANGED, data1[key]))
         else:
-            diff.append(Item(key, REMOVED, data1[key]))
-            diff.append(Item(key, ADDED, data2[key]))
+            diff.append(DiffItem(key, REMOVED, data1[key]))
+            diff.append(DiffItem(key, ADDED, data2[key]))
 
     return diff
 
