@@ -53,6 +53,8 @@ def get_json_diff(json1, json2):
             diff.append(Item(key, REMOVED, json1[key]))
         elif key in added_keys:
             diff.append(Item(key, ADDED, json2[key]))
+        # if key is not in removed_keys and added_keys then key is unchanged
+        # but value may be different
         elif json1[key] == json2[key]:
             diff.append(Item(key, UNCHANGED, json1[key]))
         else:
