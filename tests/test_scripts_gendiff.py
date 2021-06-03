@@ -1,7 +1,7 @@
 import pytest
 import subprocess
 
-from test_generate_diff import plain_json_diff
+from test_generate_diff import plain_file_diff
 
 
 @pytest.fixture
@@ -17,8 +17,8 @@ def test_scripts_gendiff_help_message(gendiff_help_message):
     )
 
 
-def test_scripts_plain_json(plain_json_diff):
-    assert plain_json_diff == subprocess.check_output(
+def test_scripts_plain_json(plain_file_diff):
+    assert plain_file_diff == subprocess.check_output(
         ["gendiff", "tests/fixtures/file1.json", "tests/fixtures/file2.json"],
         universal_newlines=True,
     )[:-1]  # delete last '\n'
