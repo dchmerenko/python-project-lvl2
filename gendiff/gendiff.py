@@ -1,5 +1,7 @@
 """Generate_diff module."""
 
+# flake8: noqa
+
 from collections import namedtuple
 
 import yaml

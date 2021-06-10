@@ -6,7 +6,7 @@ import argparse
 from gendiff.gendiff import generate_diff
 
 
-def main():
+def main():  # noqa: WPS210
     """Calculate file difference."""
     parser = argparse.ArgumentParser(description='Generate diff')
     parser.add_argument('first_file')
@@ -21,7 +21,6 @@ def main():
 
     file_path1 = args.first_file
     file_path2 = args.second_file
-    output_format = args.format
 
     diff = generate_diff(file_path1, file_path2)
     print(diff)
