@@ -109,4 +109,3 @@ def make_string(child, nest_level=0):
         result.append(str(child))
 
     return '\n'.join(result)
-
