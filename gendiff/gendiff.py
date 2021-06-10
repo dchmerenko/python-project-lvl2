@@ -8,7 +8,9 @@ ADDED = '+'
 UNCHANGED = ' '
 REMOVED = '-'
 
-INDENT = '  '
+INDENT = '    '
+
+DiffItem = namedtuple('DiffItem', 'key, prefix, value')
 
 
 def generate_diff(file_path1, file_path2):
@@ -21,7 +23,7 @@ def generate_diff(file_path1, file_path2):
     Returns:
         multi-line string with differences
     """
-    # as json is a valid yaml format, no need to process json separately
+    # as json is a valid yaml format, no need to process json exclusively
     with open(file_path1) as f1:
         data1 = yaml.safe_load(f1)
     with open(file_path2) as f2:
@@ -29,7 +31,7 @@ def generate_diff(file_path1, file_path2):
 
     data_diff = get_data_diff(data1, data2)
 
-    return convert_diff_to_string(data_diff)
+    return make_string(data_diff)
 
 
 def get_data_diff(data1, data2):
@@ -44,7 +46,6 @@ def get_data_diff(data1, data2):
         list of differences
     """
     diff = []
-    DiffItem = namedtuple('Item', 'key, prefix, value')
 
     added_keys = data2.keys() - data1.keys()
     removed_keys = data1.keys() - data2.keys()
@@ -58,6 +59,9 @@ def get_data_diff(data1, data2):
         # but value may be different
         elif data1[key] == data2[key]:
             diff.append(DiffItem(key, UNCHANGED, data1[key]))
+        elif isinstance(data1[key], dict) and isinstance(data2[key], dict):
+            nested_data = get_data_diff(data1[key], data2[key])
+            diff.append(DiffItem(key, UNCHANGED, nested_data))
         else:
             diff.append(DiffItem(key, REMOVED, data1[key]))
             diff.append(DiffItem(key, ADDED, data2[key]))
@@ -65,36 +69,44 @@ def get_data_diff(data1, data2):
     return diff
 
 
-def convert_diff_to_string(diff):
+def make_string(child, nest_level=0):
     """
-    Convert list of differences to string.
+    Convert item to string.
 
     Args:
-        diff: list of differences
+        child: item
+        nest_level: nesting level
 
     Returns:
         multi-line string with differences
     """
-    first_line = '{'
-    lines = map(get_formatted_line, diff)
-    last_line = '}'
+    result = []
+    indent = INDENT * nest_level
+    if isinstance(child, list):
+        lines = map(
+            lambda list_element: make_string(list_element, nest_level),
+            child,
+        )
+        result.extend(('{', *lines, indent + '}'))
+    elif isinstance(child, DiffItem):
+        line = '{0}  {1} {2}: {3}'.format(
+            indent,
+            child.prefix,
+            child.key,
+            make_string(child.value, nest_level + 1),
+        )
+        result.append(line)
+    elif isinstance(child, dict):
+        lines = (
+            '{0}    {1}: {2}'.format(
+                indent,
+                key,
+                make_string(child_value, nest_level + 1),
+            ) for key, child_value in child.items()
+        )
+        result.extend(('{', *lines, indent + '}'))
+    else:
+        result.append(str(child))
 
-    return '\n'.join((first_line, *lines, last_line))
+    return '\n'.join(result)
 
-
-def get_formatted_line(diff_item):
-    """
-    Return formatted line for list of differences item.
-
-    Args:
-        diff_item: single item from diff list
-
-    Returns:
-          formatted line
-    """
-    return '{indent}{prefix} {key}: {value}'.format(
-        indent=INDENT,
-        prefix=diff_item.prefix,
-        key=diff_item.key,
-        value=diff_item.value,
-    )

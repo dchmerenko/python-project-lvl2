@@ -14,13 +14,14 @@ def main():
     parser.add_argument(
         '-f',
         '--format',
-        default='plain',
+        default='stylish',
         help='set format of output',
     )
     args = parser.parse_args()
 
     file_path1 = args.first_file
     file_path2 = args.second_file
+    output_format = args.format
 
     diff = generate_diff(file_path1, file_path2)
     print(diff)
