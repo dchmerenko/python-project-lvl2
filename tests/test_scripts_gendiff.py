@@ -1,13 +1,5 @@
-import pytest
 import subprocess
-
-from test_generate_diff import plain_file_diff
-
-
-@pytest.fixture
-def gendiff_help_message():
-    """Return script help message."""
-    return open("tests/fixtures/gendiff_help_message").read()
+from tests.fixtures.fixtures import *
 
 
 def test_scripts_gendiff_help_message(gendiff_help_message):
@@ -18,9 +10,14 @@ def test_scripts_gendiff_help_message(gendiff_help_message):
     )
 
 
-def test_scripts_plain_json(plain_file_diff):
+def test_scripts_plain_json_stylish_format(plain_file_stylish_format_diff):
     """Test script process plain json files differences."""
-    assert plain_file_diff == subprocess.check_output(
+    assert plain_file_stylish_format_diff == subprocess.check_output(
         ["gendiff", "tests/fixtures/file1.json", "tests/fixtures/file2.json"],
         universal_newlines=True,
     )[:-1]  # delete last '\n'
+
+
+# def test_scripts_plain_json_plain_format():
+#     """Test stylish output."""
+#     assert True

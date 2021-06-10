@@ -1,7 +1,5 @@
 """Generate_diff module."""
 
-# flake8: noqa
-
 from collections import namedtuple
 
 import yaml
@@ -15,12 +13,13 @@ INDENT = '    '
 DiffItem = namedtuple('DiffItem', 'key, prefix, value')
 
 
-def generate_diff(file_path1, file_path2):
+def generate_diff(file_path1, file_path2, format_name='stylish'):
     """Return file difference.
 
     Args:
         file_path1: path to first file
         file_path2: path to second file
+        format_name: output format selector
 
     Returns:
         multi-line string with differences
@@ -33,6 +32,8 @@ def generate_diff(file_path1, file_path2):
 
     data_diff = get_data_diff(data1, data2)
 
+    if format_name == 'plain':
+        return make_string(data_diff)
     return make_string(data_diff)
 
 
@@ -111,3 +112,10 @@ def make_string(child, nest_level=0):
         result.append(str(child))
 
     return '\n'.join(result)
+
+
+print(generate_diff(
+    '/home/cdv/Projects/hexlet/python-project-lvl2/tests/fixtures/file3.json',
+    '/home/cdv/Projects/hexlet/python-project-lvl2/tests/fixtures/file4.json',
+    format_name='plain',
+    ))
