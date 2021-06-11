@@ -24,7 +24,7 @@ def main():  # noqa: WPS210
     format_name = args.format
 
     diff = generate_diff(file_path1, file_path2, format_name=format_name)
-    print(format_name)
+
     print(diff)
 
 

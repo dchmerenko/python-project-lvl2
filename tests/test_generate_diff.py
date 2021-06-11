@@ -4,12 +4,11 @@ from tests.fixtures.fixtures import *
 
 def test_generate_plain_json_plain_format_diff(plain_file_plain_format_diff):
     """Test plain json files differences."""
-    gd = generate_diff(
+    assert plain_file_plain_format_diff == generate_diff(
         'tests/fixtures/file1.json',
         'tests/fixtures/file2.json',
-        format_name='stylish',
+        format_name='plain',
     )
-    assert plain_file_plain_format_diff == gd
 
 
 def test_generate_nested_json_stylish_format_diff(nested_file_stylish_format_diff):

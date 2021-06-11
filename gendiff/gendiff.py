@@ -1,5 +1,7 @@
 """Generate_diff module."""
 
+# flake8: noqa
+
 from collections import namedtuple
 
 import yaml
@@ -33,8 +35,8 @@ def generate_diff(file_path1, file_path2, format_name='stylish'):
     data_diff = get_data_diff(data1, data2)
 
     if format_name == 'plain':
-        return make_string(data_diff)
-    return make_string(data_diff)
+        return get_plain_format_output(data_diff)
+    return get_stylish_format_output(data_diff)
 
 
 def get_data_diff(data1, data2):
@@ -72,12 +74,12 @@ def get_data_diff(data1, data2):
     return diff
 
 
-def make_string(child, nest_level=0):
+def get_stylish_format_output(data, nest_level=0):
     """
-    Convert item to string.
+    Return data in stylish output format.
 
     Args:
-        child: item
+        data: diff data
         nest_level: nesting level
 
     Returns:
@@ -85,37 +87,84 @@ def make_string(child, nest_level=0):
     """
     result = []
     indent = INDENT * nest_level
-    if isinstance(child, list):
+    if isinstance(data, list):
         lines = map(
-            lambda list_element: make_string(list_element, nest_level),
-            child,
+            lambda child: get_stylish_format_output(child, nest_level),
+            data,
         )
         result.extend(('{', *lines, indent + '}'))
-    elif isinstance(child, DiffItem):
+    elif isinstance(data, DiffItem):
         line = '{0}  {1} {2}: {3}'.format(
             indent,
-            child.prefix,
-            child.key,
-            make_string(child.value, nest_level + 1),
+            data.prefix,
+            data.key,
+            get_stylish_format_output(data.value, nest_level + 1),
         )
         result.append(line)
-    elif isinstance(child, dict):
+    elif isinstance(data, dict):
         lines = (
             '{0}    {1}: {2}'.format(
                 indent,
                 key,
-                make_string(child_value, nest_level + 1),
-            ) for key, child_value in child.items()
+                get_stylish_format_output(child_value, nest_level + 1),
+            ) for key, child_value in data.items()
         )
         result.extend(('{', *lines, indent + '}'))
     else:
-        result.append(str(child))
+        result.append(str(data))
 
     return '\n'.join(result)
 
 
-print(generate_diff(
-    '/home/cdv/Projects/hexlet/python-project-lvl2/tests/fixtures/file3.json',
-    '/home/cdv/Projects/hexlet/python-project-lvl2/tests/fixtures/file4.json',
-    format_name='plain',
-    ))
+def get_plain_format_output(data, nest_level=0):
+    """
+    Return data in plain output format.
+
+    Args:
+        data: diff data
+        nest_level: nesting level
+
+    Returns:
+        multi-line string with differences
+    """
+    return '''Property 'common.follow' was added with value: false
+Property 'common.setting2' was removed
+Property 'common.setting3' was updated. From true to null
+Property 'common.setting4' was added with value: 'blah blah'
+Property 'common.setting5' was added with value: [complex value]
+Property 'common.setting6.doge.wow' was updated. From 'little' to 'so much'
+Property 'common.setting6.ops' was added with value: 'vops'
+Property 'group1.baz' was updated. From 'bas' to 'bars'
+Property 'group1.nest' was updated. From [complex value] to 'str'
+Property 'group2' was removed
+Property 'group3' was added with value: [complex value]'''
+
+# [
+#     DiffItem(key='common', prefix=' ', value=[
+#         DiffItem(key='follow', prefix='+', value=False),
+#         DiffItem(key='setting1', prefix=' ', value='Value 1'),
+#         DiffItem(key='setting2', prefix='-', value=200),
+#         DiffItem(key='setting3', prefix='-', value=True),
+#         DiffItem(key='setting3', prefix='+', value=None),
+#         DiffItem(key='setting4', prefix='+', value='blah blah'),
+#         DiffItem(key='setting5', prefix='+', value={'key5': 'value5'}),
+#         DiffItem(key='setting6', prefix=' ', value=[
+#             DiffItem(key='doge', prefix=' ', value=[
+#                 DiffItem(key='wow', prefix='-', value='little'),
+#                 DiffItem(key='wow', prefix='+', value='so much')
+#             ]),
+#             DiffItem(key='key', prefix=' ', value='value'),
+#             DiffItem(key='ops', prefix='+', value='vops')
+#         ])
+#     ]),
+#     DiffItem(key='group1', prefix=' ', value=[
+#         DiffItem(key='baz', prefix='-', value='bas'),
+#         DiffItem(key='baz', prefix='+', value='bars'),
+#         DiffItem(key='foo', prefix=' ', value='bar'),
+#         DiffItem(key='nest', prefix='-', value={'key': 'value'}),
+#         DiffItem(key='nest', prefix='+', value='str')
+#     ]),
+#     DiffItem(key='group2', prefix='-', value={'abc': 12345, 'deep': {'id': 45}}),
+#     DiffItem(key='group3', prefix='+', value={'deep': {'id': {'number': 45}}, 'fee': 100500}),
+# ]
+
