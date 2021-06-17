@@ -3,10 +3,10 @@
 
 import argparse
 
-from gendiff.gendiff import generate_diff
+from gendiff.gen_diff import generate_diff
 
 
-def main():  # noqa: WPS210
+def main():
     """Calculate file difference."""
     parser = argparse.ArgumentParser(description='Generate diff')
     parser.add_argument('first_file')
