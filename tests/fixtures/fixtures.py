@@ -20,6 +20,12 @@ def plain_file_stylish_format_diff():
 
 
 @pytest.fixture
+def nested_file_plain_format_diff():
+    """Return nested files diff example."""
+    return open('tests/fixtures/file3_file4_plain_diff').read()
+
+
+@pytest.fixture
 def nested_file_stylish_format_diff():
     """Return nested files diff example."""
     return open('tests/fixtures/file3_file4_stylish_diff').read()

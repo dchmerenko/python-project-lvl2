@@ -11,6 +11,23 @@ def test_generate_plain_json_plain_format_diff(plain_file_plain_format_diff):
     )
 
 
+def test_generate_plane_json_stylish_format(plain_file_stylish_format_diff):
+    """Test plain json files differences."""
+    assert plain_file_stylish_format_diff == generate_diff(
+        'tests/fixtures/file1.json',
+        'tests/fixtures/file2.json',
+    )
+
+
+def test_generate_nested_json_plain_format(nested_file_plain_format_diff):
+    """Test nested json files differences."""
+    assert nested_file_plain_format_diff == generate_diff(
+        'tests/fixtures/file3.json',
+        'tests/fixtures/file4.json',
+        format_name='plain',
+    )
+
+
 def test_generate_nested_json_stylish_format_diff(nested_file_stylish_format_diff):
     """Test nested json file differences."""
     assert nested_file_stylish_format_diff == generate_diff(

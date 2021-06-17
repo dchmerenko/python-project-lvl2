@@ -1,18 +1,23 @@
 """Generate_diff module."""
 
-# flake8: noqa
-
 from collections import namedtuple
 
 import yaml
 
-ADDED = '+'
-UNCHANGED = ' '
-REMOVED = '-'
+UNCHANGED = 0
+ADDED = 1
+REMOVED = 2
+UPDATED = 3
+NESTED = 4
+
+data_prefix = {
+    ADDED: '+',
+    REMOVED: '-',
+}
 
 INDENT = '    '
 
-DiffItem = namedtuple('DiffItem', 'key, prefix, value')
+DiffItem = namedtuple('DiffItem', 'key, status, value')
 
 
 def generate_diff(file_path1, file_path2, format_name='stylish'):
@@ -40,8 +45,7 @@ def generate_diff(file_path1, file_path2, format_name='stylish'):
 
 
 def get_data_diff(data1, data2):
-    """
-    Return a data difference.
+    """Return a data difference.
 
     Args:
         data1: first data
@@ -56,27 +60,39 @@ def get_data_diff(data1, data2):
     removed_keys = data1.keys() - data2.keys()
 
     for key in sorted(data1.keys() | data2.keys()):
+        value1, value2 = data1.get(key), data2.get(key)
+
         if key in removed_keys:
-            diff.append(DiffItem(key, REMOVED, data1[key]))
+            status, value = REMOVED, value1
         elif key in added_keys:
-            diff.append(DiffItem(key, ADDED, data2[key]))
-        # if key is not in removed_keys and added_keys then key is unchanged
-        # but value may be different
-        elif data1[key] == data2[key]:
-            diff.append(DiffItem(key, UNCHANGED, data1[key]))
-        elif isinstance(data1[key], dict) and isinstance(data2[key], dict):
-            nested_data = get_data_diff(data1[key], data2[key])
-            diff.append(DiffItem(key, UNCHANGED, nested_data))
+            status, value = ADDED, value2
+        elif value1 == value2:
+            status, value = UNCHANGED, value1
+        elif is_nested(value1, value2):
+            status, value = NESTED, get_data_diff(value1, value2)
         else:
-            diff.append(DiffItem(key, REMOVED, data1[key]))
-            diff.append(DiffItem(key, ADDED, data2[key]))
+            status, value = UPDATED, (value1, value2)
+
+        diff.append(DiffItem(key, status, value))
 
     return diff
 
 
-def get_stylish_format_output(data, nest_level=0):
+def is_nested(value1, value2):
+    """Check if both values are dict type.
+
+    Args:
+        value1: first value
+        value2: second value
+
+    Returns:
+        True if both values are dict type else False
     """
-    Return data in stylish output format.
+    return isinstance(value1, dict) and isinstance(value2, dict)
+
+
+def get_stylish_format_output(data, nest_level=0):
+    """Return data in stylish output format.
 
     Args:
         data: diff data
@@ -85,86 +101,117 @@ def get_stylish_format_output(data, nest_level=0):
     Returns:
         multi-line string with differences
     """
+
+    def get_line(prefix, key, value):
+        """Format line.
+
+        Args:
+            prefix: prefix
+            key: key
+            value: value
+
+        Returns:
+            Formatted line
+        """
+        return '{indent}  {prefix} {key}: {value}'.format(
+            indent=indent,
+            prefix=prefix,
+            key=key,
+            value=get_stylish_format_output(value, nest_level + 1),
+        )
+
     result = []
     indent = INDENT * nest_level
+
     if isinstance(data, list):
         lines = map(
-            lambda child: get_stylish_format_output(child, nest_level),
+            lambda diff_item: get_stylish_format_output(diff_item, nest_level),
             data,
         )
-        result.extend(('{', *lines, indent + '}'))
-    elif isinstance(data, DiffItem):
-        line = '{0}  {1} {2}: {3}'.format(
-            indent,
-            data.prefix,
-            data.key,
-            get_stylish_format_output(data.value, nest_level + 1),
-        )
-        result.append(line)
+        line = '\n'.join(('{', *lines, indent + '}'))
     elif isinstance(data, dict):
-        lines = (
-            '{0}    {1}: {2}'.format(
-                indent,
-                key,
-                get_stylish_format_output(child_value, nest_level + 1),
-            ) for key, child_value in data.items()
+        lines = map(
+            lambda key: get_line(' ', key, data[key]),
+            data,
         )
-        result.extend(('{', *lines, indent + '}'))
+        line = '\n'.join(('{', *lines, indent + '}'))
+    elif isinstance(data, DiffItem):
+        if data.status == UPDATED:
+            removed_line = get_line('-', data.key, data.value[0])
+            added_line = get_line('+', data.key, data.value[1])
+            line = '\n'.join((removed_line, added_line))
+        else:
+            prefix = data_prefix.get(data.status, ' ')
+            line = get_line(prefix, data.key, data.value)
     else:
-        result.append(str(data))
+        line = str(data)
+
+    result.append(line)
 
     return '\n'.join(result)
 
 
-def get_plain_format_output(data, nest_level=0):
-    """
-    Return data in plain output format.
+def get_plain_format_output(data, key=''):
+    """Return data in plain output format.
 
     Args:
         data: diff data
-        nest_level: nesting level
+        key: data key
 
     Returns:
         multi-line string with differences
     """
-    return '''Property 'common.follow' was added with value: false
-Property 'common.setting2' was removed
-Property 'common.setting3' was updated. From true to null
-Property 'common.setting4' was added with value: 'blah blah'
-Property 'common.setting5' was added with value: [complex value]
-Property 'common.setting6.doge.wow' was updated. From 'little' to 'so much'
-Property 'common.setting6.ops' was added with value: 'vops'
-Property 'group1.baz' was updated. From 'bas' to 'bars'
-Property 'group1.nest' was updated. From [complex value] to 'str'
-Property 'group2' was removed
-Property 'group3' was added with value: [complex value]'''
+    def str_value(value):
+        """Get string representation for value.
 
-# [
-#     DiffItem(key='common', prefix=' ', value=[
-#         DiffItem(key='follow', prefix='+', value=False),
-#         DiffItem(key='setting1', prefix=' ', value='Value 1'),
-#         DiffItem(key='setting2', prefix='-', value=200),
-#         DiffItem(key='setting3', prefix='-', value=True),
-#         DiffItem(key='setting3', prefix='+', value=None),
-#         DiffItem(key='setting4', prefix='+', value='blah blah'),
-#         DiffItem(key='setting5', prefix='+', value={'key5': 'value5'}),
-#         DiffItem(key='setting6', prefix=' ', value=[
-#             DiffItem(key='doge', prefix=' ', value=[
-#                 DiffItem(key='wow', prefix='-', value='little'),
-#                 DiffItem(key='wow', prefix='+', value='so much')
-#             ]),
-#             DiffItem(key='key', prefix=' ', value='value'),
-#             DiffItem(key='ops', prefix='+', value='vops')
-#         ])
-#     ]),
-#     DiffItem(key='group1', prefix=' ', value=[
-#         DiffItem(key='baz', prefix='-', value='bas'),
-#         DiffItem(key='baz', prefix='+', value='bars'),
-#         DiffItem(key='foo', prefix=' ', value='bar'),
-#         DiffItem(key='nest', prefix='-', value={'key': 'value'}),
-#         DiffItem(key='nest', prefix='+', value='str')
-#     ]),
-#     DiffItem(key='group2', prefix='-', value={'abc': 12345, 'deep': {'id': 45}}),
-#     DiffItem(key='group3', prefix='+', value={'deep': {'id': {'number': 45}}, 'fee': 100500}),
-# ]
+        Args:
+            value: value
 
+        Returns:
+            Value or '[complex value]'
+        """
+        return '[complex value]' if isinstance(value, dict) else repr(value)
+
+    def get_key(child_key):
+        """Get key for nested value.
+
+        Args:
+            child_key: child_key
+
+        Returns:
+            Key for nested value
+        """
+        return '{0}.{1}'.format(key, child_key) if key else child_key
+
+    result = []
+
+    for diff_item in data:
+        if diff_item.status == UNCHANGED:
+            continue
+        elif diff_item.status == ADDED:
+            line = "Property '{key}' was added with value: {value}".format(
+                key=get_key(diff_item.key),
+                value=str_value(diff_item.value),
+            )
+        elif diff_item.status == REMOVED:
+            line = "Property '{key}' was removed".format(
+                key=get_key(diff_item.key),
+            )
+        elif diff_item.status == UPDATED:
+            line_msg = "Property '{key}' was updated. From {old} to {new}"
+            line = line_msg.format(
+                key=get_key(diff_item.key),
+                old=str_value(diff_item.value[0]),
+                new=str_value(diff_item.value[1]),
+            )
+        elif diff_item.status == NESTED:
+            line = get_plain_format_output(
+                diff_item.value,
+                key=get_key(diff_item.key),
+            )
+        else:
+            line = 'Wrong diff item status'
+
+        result.append(line)
+
+    return '\n'.join(result)
