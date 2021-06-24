@@ -1,9 +1,9 @@
 """Generate_diff module."""
 
 import yaml
+from gendiff.formatters.json_formatter import get_json_format_output
 from gendiff.formatters.plain import get_plain_format_output
 from gendiff.formatters.stylish import get_stylish_format_output
-from gendiff.lib import ADDED, NESTED, REMOVED, UNCHANGED, UPDATED, DiffItem
 
 
 def generate_diff(file_path1, file_path2, format_name='stylish'):
@@ -27,6 +27,8 @@ def generate_diff(file_path1, file_path2, format_name='stylish'):
 
     if format_name == 'plain':
         return get_plain_format_output(diff)
+    elif format_name == 'json':
+        return get_json_format_output(diff)
     return get_stylish_format_output(diff)
 
 
@@ -40,7 +42,7 @@ def get_diff(data1, data2):
     Returns:
         list of differences
     """
-    diff = []
+    diff = {}
 
     added_keys = data2.keys() - data1.keys()
     removed_keys = data1.keys() - data2.keys()
@@ -49,17 +51,16 @@ def get_diff(data1, data2):
         value1, value2 = data1.get(key), data2.get(key)
 
         if key in removed_keys:
-            status, value = REMOVED, value1
+            diff['- ' + key] = value1
         elif key in added_keys:
-            status, value = ADDED, value2
+            diff['+ ' + key] = value2
         elif value1 == value2:
-            status, value = UNCHANGED, value1
+            diff[key] = value1
         elif is_nested(value1, value2):
-            status, value = NESTED, get_diff(value1, value2)
+            diff[key] = get_diff(value1, value2)
         else:
-            status, value = UPDATED, (value1, value2)
-
-        diff.append(DiffItem(key, status, value))
+            diff['- ' + key] = value1
+            diff['+ ' + key] = value2
 
     return diff
 
