@@ -5,7 +5,7 @@ install:
 	poetry install
 
 test:
-	poetry run pytest -xv
+	poetry run pytest --cov=gendiff tests/ --cov-report xml
 
 test-coverage:
 	poetry run pytest --cov=gendiff --cov-report xml
