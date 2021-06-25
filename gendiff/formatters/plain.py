@@ -1,5 +1,7 @@
 """Plain formatter."""
 
+import json
+
 
 def get_plain_format_output(diff, parent_key=''):
     """Recursively return data in plain output format.
@@ -80,7 +82,7 @@ def format_value(value):
     Returns:
         Plain property value or '[complex value]'
     """
-    return '[complex value]' if isinstance(value, dict) else repr(value)
+    return '[complex value]' if isinstance(value, dict) else json.JSONEncoder().encode(value)
 
 
 def combine_key(parent_key, child_key):
