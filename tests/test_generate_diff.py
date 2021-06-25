@@ -1,3 +1,5 @@
+# flake8: noqa
+
 from gendiff.gendiff import generate_diff
 from tests.fixtures.fixtures import *
 
@@ -78,7 +80,7 @@ def test_generate_56_plain_format(file56_plain_format_diff):
     )
 
 
-def test_generate_56_plain_format(file56_stylish_format_diff):
+def test_generate_56_stylish_format(file56_stylish_format_diff):
     assert file56_stylish_format_diff == generate_diff(
         'tests/fixtures/file5.json',
         'tests/fixtures/file6.json',

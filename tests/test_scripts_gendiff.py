@@ -1,3 +1,5 @@
+# flake8: noqa
+
 import subprocess
 from tests.fixtures.fixtures import *
 
