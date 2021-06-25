@@ -25,7 +25,7 @@ def get_stylish_format_output(data, nest_level=0):
         )
         line = '\n'.join(('{', *lines, indent + '}'))
     else:
-        line = json.JSONEncoder().encode(data)
+        line = json.JSONEncoder().encode(data).strip('"')
     result.append(line)
 
     return '\n'.join(result)
