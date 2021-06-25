@@ -68,3 +68,18 @@ def test_generate_diff_nested_json_json_format(nested_file_json_format_diff):
         'tests/fixtures/file4.json',
         format_name='json',
     )
+
+
+def test_generate_56_plain_format(file56_plain_format_diff):
+    assert file56_plain_format_diff == generate_diff(
+        'tests/fixtures/file5.json',
+        'tests/fixtures/file6.json',
+        format_name='plain',
+    )
+
+
+def test_generate_56_plain_format(file56_stylish_format_diff):
+    assert file56_stylish_format_diff == generate_diff(
+        'tests/fixtures/file5.json',
+        'tests/fixtures/file6.json',
+    )

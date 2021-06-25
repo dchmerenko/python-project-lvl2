@@ -42,7 +42,8 @@ def get_plain_format_output(diff, parent_key=''):
         else:
             continue
 
-        result.append(line)
+        if line:
+            result.append(line)
 
     return '\n'.join(result)
 
@@ -82,7 +83,9 @@ def format_value(value):
     Returns:
         Plain property value or '[complex value]'
     """
-    return '[complex value]' if isinstance(value, dict) else json.JSONEncoder().encode(value).replace('\"', '\'')
+    if isinstance(value, dict):
+        return '[complex value]'
+    return json.JSONEncoder().encode(value).replace('\"', '\'')
 
 
 def combine_key(parent_key, child_key):

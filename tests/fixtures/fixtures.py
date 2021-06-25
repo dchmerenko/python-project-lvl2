@@ -41,3 +41,13 @@ def nested_file_json_format_diff():
 def plain_file_json_format_diff():
     """Return nested files diff example."""
     return open('tests/fixtures/file1_file2_json_diff').read()
+
+
+@pytest.fixture
+def file56_plain_format_diff():
+    return open('tests/fixtures/result_plain').read()
+
+
+@pytest.fixture
+def file56_stylish_format_diff():
+    return open('tests/fixtures/result_stylish').read()
