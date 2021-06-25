@@ -82,7 +82,7 @@ def format_value(value):
     Returns:
         Plain property value or '[complex value]'
     """
-    return '[complex value]' if isinstance(value, dict) else json.JSONEncoder().encode(value)
+    return '[complex value]' if isinstance(value, dict) else json.JSONEncoder().encode(value).replace('\"', '\'')
 
 
 def combine_key(parent_key, child_key):
