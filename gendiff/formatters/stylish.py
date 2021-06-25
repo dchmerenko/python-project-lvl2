@@ -1,5 +1,7 @@
 """Stylish formatter."""
 
+import json
+
 from gendiff.lib import INDENT
 
 
@@ -23,7 +25,7 @@ def get_stylish_format_output(data, nest_level=0):
         )
         line = '\n'.join(('{', *lines, indent + '}'))
     else:
-        line = str(data)
+        line = json.JSONEncoder().encode(data)
     result.append(line)
 
     return '\n'.join(result)
