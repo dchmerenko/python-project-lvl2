@@ -18,7 +18,7 @@ def get_plain_format_output(diff, parent_key=''):
 
     for key, value in diff.items():
         if is_updated(key, keys):
-            updated_value = diff[get_updated_key(key)]
+            updated_value = diff[get_key_for_updated_value(key)]
             line = "Property '{0}' was updated. From {1} to {2}"
             line = line.format(
                 combine_key(parent_key, key),
@@ -62,7 +62,7 @@ def strip(key):
     return key
 
 
-def get_updated_key(key):
+def get_key_for_updated_value(key):
     """Return key with updated prefix.
 
     Args:

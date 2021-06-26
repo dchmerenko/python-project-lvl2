@@ -25,11 +25,13 @@ def generate_diff(file_path1, file_path2, format_name='stylish'):
 
     diff = get_diff(data1, data2)
 
-    if format_name == 'plain':
-        return get_plain_format_output(diff)
-    elif format_name == 'json':
-        return get_json_format_output(diff)
-    return get_stylish_format_output(diff)
+    formatter = {
+        'json': get_json_format_output,
+        'plain': get_plain_format_output,
+        'stylish': get_stylish_format_output,
+    }
+
+    return formatter[format_name](diff)
 
 
 def get_diff(data1, data2):
