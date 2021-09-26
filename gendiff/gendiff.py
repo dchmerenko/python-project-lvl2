@@ -6,7 +6,7 @@ from gendiff.formatters.plain import get_plain_format_output
 from gendiff.formatters.stylish import get_stylish_format_output
 
 
-def generate_diff(file_path1, file_path2, format_name='stylish'):
+def generate_diff(file_path1, file_path2, format_name):
     """Return file difference.
 
     Args:
@@ -31,7 +31,9 @@ def generate_diff(file_path1, file_path2, format_name='stylish'):
         'stylish': get_stylish_format_output,
     }
 
-    return formatter[format_name](diff)
+    format_diff = formatter.get(format_name, get_stylish_format_output)
+
+    return format_diff(diff)
 
 
 def get_diff(data1, data2):
