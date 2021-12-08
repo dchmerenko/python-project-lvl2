@@ -1,9 +1,15 @@
 """Generate_diff module."""
 
-import yaml
+from gendiff.data_reader import read_data
 from gendiff.formatters.json_formatter import get_json_format_output
 from gendiff.formatters.plain import get_plain_format_output
 from gendiff.formatters.stylish import get_stylish_format_output
+
+ADDED = '+'
+MODIFIED = '%'
+NESTED = '>'
+REMOVED = '-'
+UNCHANGED = '='
 
 
 def generate_diff(file_path1, file_path2, format_name):
@@ -17,11 +23,9 @@ def generate_diff(file_path1, file_path2, format_name):
     Returns:
         multi-line string with differences
     """
-    # as json is a valid yaml format, no need to process json exclusively
-    with open(file_path1) as f1:
-        data1 = yaml.safe_load(f1)
-    with open(file_path2) as f2:
-        data2 = yaml.safe_load(f2)
+
+    data1 = read_data(file_path1)
+    data2 = read_data(file_path2)
 
     diff = get_diff(data1, data2)
 
@@ -45,26 +49,37 @@ def get_diff(data1, data2):
 
     Returns:
         list of differences
+
+    diff = [
+        {
+            "key": key,
+            "type": 'added',
+            "value": data2[key],
+        },
+        ...
+    ]
     """
-    diff = {}
+    diff = []
 
     added_keys = data2.keys() - data1.keys()
     removed_keys = data1.keys() - data2.keys()
 
     for key in sorted(data1.keys() | data2.keys()):
+        record = {'key': key}
         value1, value2 = data1.get(key), data2.get(key)
 
         if key in removed_keys:
-            diff['- ' + key] = value1
+            record['type'], record['value'] = REMOVED, value1
         elif key in added_keys:
-            diff['+ ' + key] = value2
+            record['type'], record['value'] = ADDED, value2
         elif value1 == value2:
-            diff[key] = value1
+            record['type'], record['value'] = UNCHANGED, value1
         elif is_nested(value1, value2):
-            diff[key] = get_diff(value1, value2)
+            record['type'], record['value'] = NESTED, get_diff(value1, value2)
         else:
-            diff['- ' + key] = value1
-            diff['+ ' + key] = value2
+            record['type'], record['value'] = MODIFIED, (value1, value2)
+
+        diff.append(record)
 
     return diff
 
