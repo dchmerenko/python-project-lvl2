@@ -11,22 +11,17 @@ def read_data(file_path):
                   ".yml": "yaml",
                   ".yaml": "yaml"}
 
+    data_parsers = {"json": json.load,
+                    "yaml": yaml.safe_load}
+
     _, extension = os.path.splitext(file_path)
 
     file_type = file_types.get(extension.lower(), None)
 
+    if not file_type:
+        raise ValueError("Wrong file type: {file_path}")
+
     with open(file_path) as f:
-        file_data = f.read()
+        data = data_parsers[file_type](f)
 
-    return parse_data(file_data, file_type)
-
-
-def parse_data(file_data, file_type):
-    """Load file data to dictionary."""
-
-    data_parsers = {"json": json.load,
-                    "yaml": yaml.safe_load}
-    if file_type:
-        return data_parser[file_type](file_data)
-    else:
-        raise ValueError("Wrong file type")
+    return data
