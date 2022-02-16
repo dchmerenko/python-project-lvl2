@@ -27,7 +27,6 @@ def test_generate_diff_plane_json_stylish_format(plain_file_stylish_format_diff)
     assert plain_file_stylish_format_diff == generate_diff(
         'tests/fixtures/file1.json',
         'tests/fixtures/file2.json',
-        format_name='stylish',
     )
 
 
@@ -45,7 +44,6 @@ def test_generate_diff_plain_yaml_stylish_format(plain_file_stylish_format_diff)
     assert plain_file_stylish_format_diff == generate_diff(
         'tests/fixtures/file1.yml',
         'tests/fixtures/file2.yaml',
-        format_name='stylish',
     )
 
 

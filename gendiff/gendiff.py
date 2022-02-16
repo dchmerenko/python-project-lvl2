@@ -7,7 +7,7 @@ from gendiff.formatters.stylish import get_stylish_format_output
 from gendiff.lib import ADDED, MODIFIED, NESTED, REMOVED, UNCHANGED
 
 
-def generate_diff(file_path1, file_path2, format_name):
+def generate_diff(file_path1, file_path2, format_name='stylish'):
     """Return file difference.
 
     Args:
