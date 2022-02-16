@@ -2,6 +2,8 @@
 
 import json
 
+from gendiff.lib import ADDED, MODIFIED, NESTED, REMOVED
+
 
 def get_plain_format_output(diff, parent_key=''):
     """Recursively return data in plain output format.
@@ -13,79 +15,54 @@ def get_plain_format_output(diff, parent_key=''):
     Returns:
         multi-line string with differences in plain format
     """
-    result = []
-    keys = diff.keys()
+    lines = []
 
-    for key, value in diff.items():
-        if is_updated(key, keys):
-            updated_value = diff[get_key_for_updated_value(key)]
-            line = "Property '{0}' was updated. From {1} to {2}"
-            line = line.format(
-                combine_key(parent_key, key),
-                format_value(value),
-                format_value(updated_value),
-            )
-        elif is_removed(key):
-            line = "Property '{0}' was removed".format(
-                combine_key(parent_key, key),
-            )
-        elif is_added(key, keys):
+    records = {
+        record['key']: (record['type'], record['value']) for record in diff
+    }
+
+    for key, (record_type, record_value) in records.items():
+        if record_type == ADDED:
             line = "Property '{0}' was added with value: {1}".format(
                 combine_key(parent_key, key),
-                format_value(value),
+                format_value(record_value),
             )
-        elif isinstance(value, dict):
+        elif record_type == MODIFIED:
+            line = "Property '{0}' was updated. From {1} to {2}".format(
+                combine_key(parent_key, key),
+                format_value(record_value[0]),
+                format_value(record_value[1]),
+            )
+        elif record_type == NESTED:
             line = get_plain_format_output(
-                value,
+                record_value,
+                combine_key(parent_key, key),
+            )
+        elif record_type == REMOVED:
+            line = "Property '{0}' was removed".format(
                 combine_key(parent_key, key),
             )
         else:
             continue
 
         if line:
-            result.append(line)
+            lines.append(line)
 
-    return '\n'.join(result)
-
-
-def strip(key):
-    """Strip key from prefix.
-
-    Args:
-        key: key
-
-    Returns:
-        key stripped from prefix
-    """
-    if key.startswith('- ') or key.startswith('+ '):
-        return key[2:]
-    return key
+    return '\n'.join(lines)
 
 
-def get_key_for_updated_value(key):
-    """Return key with updated prefix.
-
-    Args:
-        key: key
-
-    Returns:
-        key with prefix '+ '
-    """
-    return '+ ' + strip(key)
-
-
-def format_value(value):
+def format_value(record_value):
     """Return string representation for property value.
 
     Args:
-        value: property value
+        record_value: property value
 
     Returns:
         Plain property value or '[complex value]'
     """
-    if isinstance(value, dict):
+    if isinstance(record_value, dict):
         return '[complex value]'
-    return json.JSONEncoder().encode(value).replace('\"', '\'')
+    return json.JSONEncoder().encode(record_value).replace('"', "'")
 
 
 def combine_key(parent_key, child_key):
@@ -98,43 +75,4 @@ def combine_key(parent_key, child_key):
     Returns:
         combined key
     """
-    child_key = strip(child_key)
     return '{0}.{1}'.format(parent_key, child_key) if parent_key else child_key
-
-
-def is_updated(key, keys):
-    """Check if key value is an updated value.
-
-    Args:
-        key: key
-        keys: keys
-
-    Returns:
-        True if key value is updated value else False
-    """
-    return key.startswith('- ') and ('+ ' + strip(key) in keys)
-
-
-def is_removed(key):
-    """Check if key is a key for removed value.
-
-    Args:
-        key: key
-
-    Returns:
-        True if key value is removed value else False
-    """
-    return key.startswith('- ')
-
-
-def is_added(key, keys):
-    """Check if key is a key for added value.
-
-    Args:
-        key: key
-        keys: keys
-
-    Returns:
-        True if key value is added value else False
-    """
-    return key.startswith('+ ') and ('- ' + strip(key) not in keys)

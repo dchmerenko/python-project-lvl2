@@ -7,7 +7,6 @@ from gendiff.gendiff import generate_diff
 
 def main():
     """Print formatted file difference."""
-
     args = get_args()
 
     diff = generate_diff(

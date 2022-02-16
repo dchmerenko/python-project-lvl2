@@ -1,15 +1,10 @@
 """Generate_diff module."""
 
 from gendiff.data_reader import read_data
-from gendiff.formatters.json_formatter import get_json_format_output
+from gendiff.formatters.json import get_json_format_output
 from gendiff.formatters.plain import get_plain_format_output
 from gendiff.formatters.stylish import get_stylish_format_output
-
-ADDED = '+'
-MODIFIED = '%'
-NESTED = '>'
-REMOVED = '-'
-UNCHANGED = '='
+from gendiff.lib import ADDED, MODIFIED, NESTED, REMOVED, UNCHANGED
 
 
 def generate_diff(file_path1, file_path2, format_name):
@@ -23,7 +18,6 @@ def generate_diff(file_path1, file_path2, format_name):
     Returns:
         multi-line string with differences
     """
-
     data1 = read_data(file_path1)
     data2 = read_data(file_path2)
 
@@ -40,58 +34,44 @@ def generate_diff(file_path1, file_path2, format_name):
     return format_diff(diff)
 
 
-def get_diff(data1, data2):
+def get_diff(old_data, new_data):
     """Return a data difference.
 
     Args:
-        data1: first data
-        data2: second data
+        old_data: old data
+        new_data: new data
 
     Returns:
         list of differences
-
-    diff = [
-        {
-            "key": key,
-            "type": 'added',
-            "value": data2[key],
-        },
-        ...
-    ]
     """
     diff = []
 
-    added_keys = data2.keys() - data1.keys()
-    removed_keys = data1.keys() - data2.keys()
-
-    for key in sorted(data1.keys() | data2.keys()):
-        record = {'key': key}
-        value1, value2 = data1.get(key), data2.get(key)
-
-        if key in removed_keys:
-            record['type'], record['value'] = REMOVED, value1
-        elif key in added_keys:
-            record['type'], record['value'] = ADDED, value2
-        elif value1 == value2:
-            record['type'], record['value'] = UNCHANGED, value1
-        elif is_nested(value1, value2):
-            record['type'], record['value'] = NESTED, get_diff(value1, value2)
+    for key in sorted(old_data.keys() | new_data.keys()):
+        old_value, new_value = old_data.get(key), new_data.get(key)
+        if key not in old_data:
+            record_type, record_value = ADDED, new_value
+        elif key not in new_data:
+            record_type, record_value = REMOVED, old_value
+        elif old_value == new_value:
+            record_type, record_value = UNCHANGED, old_value
+        elif is_nested(old_value, new_value):
+            record_type, record_value = NESTED, get_diff(old_value, new_value)
         else:
-            record['type'], record['value'] = MODIFIED, (value1, value2)
+            record_type, record_value = MODIFIED, [old_value, new_value]
 
-        diff.append(record)
+        diff.append({'key': key, 'type': record_type, 'value': record_value})
 
     return diff
 
 
-def is_nested(value1, value2):
+def is_nested(old_value, new_value):
     """Check if both values are dict type.
 
     Args:
-        value1: first value
-        value2: second value
+        old_value: old value
+        new_value: new value
 
     Returns:
         True if both values are dict type else False
     """
-    return isinstance(value1, dict) and isinstance(value2, dict)
+    return isinstance(old_value, dict) and isinstance(new_value, dict)
