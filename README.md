@@ -8,4 +8,4 @@
 ["Python - programmer" by Hexlet](https://ru.hexlet.io/programs/python)
 
 #### File difference calculator.  
-[![asciicast](https://asciinema.org/a/wkPfQSuBzCn40Cq7ttlmPpYhD.svg)](https://asciinema.org/a/wkPfQSuBzCn40Cq7ttlmPpYhD)
+[![asciicast](https://asciinema.org/a/8oqkBUWTezGdwlrzIBRk5dDUN.svg)](https://asciinema.org/a/8oqkBUWTezGdwlrzIBRk5dDUN)
