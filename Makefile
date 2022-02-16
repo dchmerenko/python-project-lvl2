@@ -1,6 +1,9 @@
 gendiff:
 	poetry run gendiff
 
+package-install:
+	python3 -m pip install --user dist/*.whl --force-reinstall
+
 install:
 	poetry install
 
@@ -21,4 +24,4 @@ check: selfcheck test lint
 build: check
 	poetry build
 
-.PHONY: install test lint selfcheck check build
+.PHONY: gendiff install test lint selfcheck check build
