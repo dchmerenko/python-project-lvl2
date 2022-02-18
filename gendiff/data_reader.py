@@ -24,7 +24,7 @@ def read_data(file_path):
     }
 
     data_parsers = {
-        'json': json.load,
+        'json': json.loads,
         'yaml': yaml.safe_load,
     }
 
@@ -35,7 +35,21 @@ def read_data(file_path):
     if not file_type:
         raise ValueError('Wrong file type: {file_path}')
 
-    with open(file_path) as parsed_file:
-        parsed_data = data_parsers[file_type](parsed_file)
+    file_content = read_file(file_path)
 
-    return parsed_data
+    return data_parsers[file_type](file_content)
+
+
+def read_file(file_path):
+    """Read file content.
+
+    Args:
+        file_path: path to file
+
+    Returns:
+        file content
+    """
+    with open(file_path) as data_file:
+        file_content = data_file.read()
+
+    return file_content
