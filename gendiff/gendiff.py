@@ -1,9 +1,7 @@
 """Generate_diff module."""
 
 from gendiff.data_reader import read_data
-from gendiff.formatters.json import get_json_format_output
-from gendiff.formatters.plain import get_plain_format_output
-from gendiff.formatters.stylish import get_stylish_format_output
+from gendiff.formatters.format import format_diff
 from gendiff.lib import ADDED, MODIFIED, NESTED, REMOVED, UNCHANGED
 
 
@@ -23,15 +21,7 @@ def generate_diff(file_path1, file_path2, format_name='stylish'):
 
     diff = get_diff(data1, data2)
 
-    formatter = {
-        'json': get_json_format_output,
-        'plain': get_plain_format_output,
-        'stylish': get_stylish_format_output,
-    }
-
-    format_diff = formatter.get(format_name, get_stylish_format_output)
-
-    return format_diff(diff)
+    return format_diff(diff, format_name)
 
 
 def get_diff(old_data, new_data):
