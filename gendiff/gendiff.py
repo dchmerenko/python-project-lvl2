@@ -2,7 +2,12 @@
 
 from gendiff.data_reader import read_data
 from gendiff.formatters.format import format_diff
-from gendiff.lib import ADDED, MODIFIED, NESTED, REMOVED, UNCHANGED
+
+ADDED = 'added'
+MODIFIED = 'modified'
+NESTED = 'nested'
+REMOVED = 'removed'
+UNCHANGED = 'unchanged'
 
 
 def generate_diff(file_path1, file_path2, format_name='stylish'):

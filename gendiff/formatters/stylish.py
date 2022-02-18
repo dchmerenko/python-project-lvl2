@@ -2,7 +2,9 @@
 
 import json
 
-from gendiff.lib import ADDED, INDENT, MODIFIED, NESTED, REMOVED
+from gendiff.gendiff import ADDED, MODIFIED, NESTED, REMOVED
+
+INDENT = '    '
 
 
 def get_stylish_format_output(diff, level=0):
