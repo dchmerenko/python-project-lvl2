@@ -2,7 +2,7 @@
 
 import json
 
-from gendiff.gendiff import ADDED, MODIFIED, NESTED, REMOVED
+from gendiff.get_diff import ADDED, MODIFIED, NESTED, REMOVED
 
 
 def get_plain_format_output(diff, parent_key=''):
