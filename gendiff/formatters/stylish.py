@@ -2,7 +2,7 @@
 
 import json
 
-from gendiff.lib import ADDED, MODIFIED, NESTED, REMOVED
+from gendiff.get_diff import ADDED, MODIFIED, NESTED, REMOVED
 
 INDENT = '    '
 
