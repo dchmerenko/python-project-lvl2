@@ -16,8 +16,17 @@ def get_diff(old_data, new_data):
 
     Returns:
         list of differences
+
+    Raises:
+        ValueError: wrong file content
     """
     diff = []
+
+    if not is_dict(old_data, new_data):
+        raise ValueError(
+            "Wrong file content. "
+            "Compared files should have 'key: value' structure.",
+        )
 
     for key in sorted(old_data.keys() | new_data.keys()):
         old_value, new_value = old_data.get(key), new_data.get(key)
@@ -27,7 +36,7 @@ def get_diff(old_data, new_data):
             record_type, record_value = REMOVED, old_value
         elif old_value == new_value:
             record_type, record_value = UNCHANGED, old_value
-        elif is_nested(old_value, new_value):
+        elif is_dict(old_value, new_value):
             record_type, record_value = NESTED, get_diff(old_value, new_value)
         else:
             record_type, record_value = MODIFIED, [old_value, new_value]
@@ -37,14 +46,14 @@ def get_diff(old_data, new_data):
     return diff
 
 
-def is_nested(old_value, new_value):
+def is_dict(value1, value2):
     """Check if both values are dict type.
 
     Args:
-        old_value: old value
-        new_value: new value
+        value1: first value
+        value2: second value
 
     Returns:
         True if both values are dict type else False
     """
-    return isinstance(old_value, dict) and isinstance(new_value, dict)
+    return isinstance(value1, dict) and isinstance(value2, dict)

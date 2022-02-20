@@ -16,12 +16,16 @@ def generate_diff(file_path1, file_path2, format_name=STYLISH):
     Returns:
         multi-line string with differences
     """
-    content1, type1 = read_file(file_path1)
-    content2, type2 = read_file(file_path2)
+    try:
+        content1, type1 = read_file(file_path1)
+        content2, type2 = read_file(file_path2)
 
-    data1 = read_data(content1, type1)
-    data2 = read_data(content2, type2)
+        data1 = read_data(content1, type1)
+        data2 = read_data(content2, type2)
 
-    diff = get_diff(data1, data2)
+        diff = get_diff(data1, data2)
+    except (FileNotFoundError, ValueError) as error:
+        print(error)
+        exit(1)
 
     return format_diff(diff, format_name)
