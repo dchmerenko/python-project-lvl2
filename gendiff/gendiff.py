@@ -1,11 +1,11 @@
 """Generate_diff module."""
 
 from gendiff.data_reader import read_data, read_file
-from gendiff.formatters.format import format_diff
+from gendiff.formatters.format import STYLISH, format_diff
 from gendiff.get_diff import get_diff
 
 
-def generate_diff(file_path1, file_path2, format_name='stylish'):
+def generate_diff(file_path1, file_path2, format_name=STYLISH):
     """Return file difference.
 
     Args:

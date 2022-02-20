@@ -5,24 +5,6 @@ import os
 import yaml
 
 
-def read_data(file_content, file_type):
-    """Read data from file.
-
-    Args:
-        file_content: file content
-        file_type: file type
-
-    Returns:
-        parsed file data
-    """
-    data_parsers = {
-        'json': json.loads,
-        'yaml': yaml.safe_load,
-    }
-
-    return data_parsers[file_type](file_content)
-
-
 def read_file(file_path):
     """Read file content.
 
@@ -51,3 +33,21 @@ def read_file(file_path):
         file_content = data_file.read()
 
     return file_content, file_type
+
+
+def read_data(file_content, file_type):
+    """Read data from file.
+
+    Args:
+        file_content: file content
+        file_type: file type
+
+    Returns:
+        parsed file data
+    """
+    data_parsers = {
+        'json': json.loads,
+        'yaml': yaml.safe_load,
+    }
+
+    return data_parsers[file_type](file_content)
