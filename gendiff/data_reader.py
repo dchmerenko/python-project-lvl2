@@ -5,37 +5,20 @@ import os
 import yaml
 
 
-def read_data(file_path):
+def read_data(file_content, file_type):
     """Read data from file.
 
     Args:
-        file_path: path to file
+        file_content: file content
+        file_type: file type
 
     Returns:
         parsed file data
-
-    Raises:
-        ValueError: wrong file type
     """
-    file_types = {
-        '.json': 'json',
-        '.yml': 'yaml',
-        '.yaml': 'yaml',
-    }
-
     data_parsers = {
         'json': json.loads,
         'yaml': yaml.safe_load,
     }
-
-    _, extension = os.path.splitext(file_path)
-
-    file_type = file_types.get(extension.lower(), None)
-
-    if not file_type:
-        raise ValueError('Wrong file type: {file_path}')
-
-    file_content = read_file(file_path)
 
     return data_parsers[file_type](file_content)
 
@@ -47,9 +30,24 @@ def read_file(file_path):
         file_path: path to file
 
     Returns:
-        file content
+        file content, file type
+
+    Raises:
+        ValueError: wrong file type
     """
+    file_types = {
+        '.json': 'json',
+        '.yml': 'yaml',
+        '.yaml': 'yaml',
+    }
+
+    _, extension = os.path.splitext(file_path)
+    file_type = file_types.get(extension.lower(), None)
+
+    if not file_type:
+        raise ValueError('Wrong file type: {file_path}')
+
     with open(file_path) as data_file:
         file_content = data_file.read()
 
-    return file_content
+    return file_content, file_type
