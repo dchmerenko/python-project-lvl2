@@ -18,6 +18,9 @@ def format_diff(diff, format_name):
 
     Returns:
         multi-line string with differences
+
+    Raises:
+        ValueError: wrong output format
     """
     formatter = {
         JSON: get_json_format_output,
@@ -25,6 +28,12 @@ def format_diff(diff, format_name):
         STYLISH: get_stylish_format_output,
     }
 
-    format_output = formatter.get(format_name, get_stylish_format_output)
+    if format_name is None:
+        format_name = STYLISH
+
+    format_output = formatter.get(format_name, None)
+
+    if not format_output:
+        raise ValueError('Error: wrong output format.')
 
     return format_output(diff)
