@@ -1,6 +1,7 @@
 """Generate_diff module."""
 
-from gendiff.data_reader import read_data, read_file
+from gendiff.data_parser import parse_data
+from gendiff.data_reader import read_file
 from gendiff.formatters.format import STYLISH, format_diff
 from gendiff.get_diff import get_diff
 
@@ -20,8 +21,8 @@ def generate_diff(file_path1, file_path2, format_name=STYLISH):
         content1, type1 = read_file(file_path1)
         content2, type2 = read_file(file_path2)
 
-        data1 = read_data(content1, type1)
-        data2 = read_data(content2, type2)
+        data1 = parse_data(content1, type1)
+        data2 = parse_data(content2, type2)
 
         diff = get_diff(data1, data2)
     except (FileNotFoundError, ValueError) as error:
