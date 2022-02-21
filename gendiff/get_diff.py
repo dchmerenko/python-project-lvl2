@@ -24,7 +24,7 @@ def get_diff(old_data, new_data):
 
     if not is_dict(old_data, new_data):
         raise ValueError(
-            "Wrong data. "
+            "Error: wrong data. "
             "Compared data should have 'key: value' structure.",
         )
 
