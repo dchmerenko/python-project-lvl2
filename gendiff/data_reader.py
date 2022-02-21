@@ -27,10 +27,12 @@ def read_file(file_path):
     file_type = file_types.get(extension.lower(), None)
 
     if not file_type:
-        raise ValueError("Wrong file type: '{0}'. Only '{1}' are allowed.".format(
-            file_path,
-            ', '.join(sorted(set(file_types.values()))),
-        ))
+        raise ValueError(
+            "Wrong file type: '{0}'. Only '{1}' are allowed.".format(
+                file_path,
+                ', '.join(sorted(set(file_types.values()))),
+            ),
+        )
 
     with open(file_path) as data_file:
         file_content = data_file.read()
