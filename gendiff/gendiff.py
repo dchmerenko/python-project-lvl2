@@ -25,8 +25,10 @@ def generate_diff(file_path1, file_path2, format_name=STYLISH):
         data2 = parse_data(content2, type2)
 
         diff = get_diff(data1, data2)
+
+        file_difference = format_diff(diff, format_name)
     except (FileNotFoundError, ValueError) as error:
         print(error)
         exit(1)
 
-    return format_diff(diff, format_name)
+    return file_difference
