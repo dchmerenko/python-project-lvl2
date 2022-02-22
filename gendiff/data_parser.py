@@ -19,7 +19,7 @@ def parse_data(content, extension):
         parsed data
 
     Raises:
-        ValueError: wrong file type
+        ValueError: wrong content type
     """
     content_types = {
         '.json': JSON,
