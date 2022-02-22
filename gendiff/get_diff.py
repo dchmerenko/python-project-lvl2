@@ -18,7 +18,7 @@ def get_diff(old_data, new_data):
         list of differences
 
     Raises:
-        ValueError: wrong file content
+        ValueError: wrong data
     """
     diff = []
 
