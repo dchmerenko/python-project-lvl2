@@ -3,25 +3,35 @@
 import json
 
 import yaml
-from gendiff.data_reader import JSON, YAML
+
+JSON = 'json'
+YAML = 'yaml'
 
 
-def parse_data(file_content, file_type):
-    """Read data from file.
+def parse_data(content, extension):
+    """Parse data from content.
 
     Args:
-        file_content: file content
-        file_type: file type
+        content: content
+        extension: file extension
 
     Returns:
-        parsed file data
+        parsed data
 
     Raises:
         ValueError: wrong file type
     """
-    if not file_type:
+    content_types = {
+        '.json': JSON,
+        '.yml': YAML,
+        '.yaml': YAML,
+    }
+
+    content_type = content_types.get(extension, None)
+
+    if content_type is None:
         raise ValueError(
-            'Error: wrong file type. Only JSON, YAML files are allowed.',
+            'Error: wrong content type. Only JSON, YAML are allowed.',
         )
 
     data_parsers = {
@@ -29,4 +39,4 @@ def parse_data(file_content, file_type):
         YAML: yaml.safe_load,
     }
 
-    return data_parsers[file_type](file_content)
+    return data_parsers[content_type](content)

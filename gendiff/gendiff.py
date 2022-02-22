@@ -1,7 +1,7 @@
 """Generate_diff module."""
 
 from gendiff.data_parser import parse_data
-from gendiff.data_reader import read_file
+from gendiff.file_reader import read_file
 from gendiff.formatters.format import STYLISH, format_diff
 from gendiff.get_diff import get_diff
 
